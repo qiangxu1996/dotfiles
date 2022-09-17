@@ -1,0 +1,130 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+EXA_FOUND="$(command -v exa)"
+FD_FOUND="$(command -v fd)"
+FZF_FOUND="$(command -v fzf)"
+NVIM_FOUND="$(command -v nvim)"
+RG_FOUND="$(command -v rg)"
+
+### Added by Zinit's installer
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+        print -P "%F{33} %F{34}Installation successful.%f%b" || \
+        print -P "%F{160} The clone has failed.%f%b"
+fi
+
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit's installer chunk
+
+HYPHEN_INSENSITIVE=true
+zinit snippet OMZL::completion.zsh
+
+zinit snippet OMZL::correction.zsh
+zinit snippet OMZL::directories.zsh
+
+zinit snippet OMZL::history.zsh
+# http://zsh.sourceforge.net/Doc/Release/Options.html#History
+unsetopt share_history
+setopt inc_append_history_time
+
+zinit snippet OMZL::key-bindings.zsh
+# https://dougblack.io/words/zsh-vi-mode.html
+bindkey -v
+export KEYTIMEOUT=1
+
+zinit snippet OMZL::termsupport.zsh
+
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+
+zinit ice depth=1; zinit light romkatv/powerlevel10k
+
+export _ZL_MATCH_MODE=1
+export _ZL_ADD_ONCE=1
+alias zz='z -c'
+alias zf='z -I'
+alias zb='z -b'
+alias zbf='z -b -I'
+alias zh='z -I -t .'
+zinit ice has'lua'; zinit light skywind3000/z.lua
+
+# https://zdharma-continuum.github.io/zinit/wiki/LS_COLORS-explanation/
+zinit ice atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'; zinit light trapd00r/LS_COLORS
+
+zinit light zdharma-continuum/zinit-annex-bin-gem-node
+
+if command -v assh > /dev/null; then
+    alias ssh="assh wrapper ssh --"
+fi
+
+PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+
+zinit for \
+    if'[ ! -x "$EXA_FOUND" ]' \
+    has'unzip' \
+    atclone'cp -vf completions/exa.zsh _exa' \
+    from'gh-r' \
+    sbin'**/exa -> exa' \
+    ogham/exa
+if command -v exa > /dev/null; then
+    alias ls=exa
+fi
+
+zinit for \
+    if' [ ! -x "$FD_FOUND" ]' \
+    from'gh-r' \
+    sbin'**/fd -> fd' \
+    @sharkdp/fd
+FD="fd --hidden --no-ignore --follow --exclude .git"
+alias fd="$FD"
+
+zinit if'[ ! -x "$FZF_FOUND" ]' for \
+    from'gh-r' \
+    sbin'fzf' \
+    junegunn/fzf \
+    https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
+export FZF_DEFAULT_COMMAND="$FD --type file --color=always"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS="--ansi"
+_fzf_compgen_path() {
+    fd --color=always . "$1"
+}
+_fzf_compgen_dir() {
+    fd --type directory --color=always . "$1"
+}
+
+zinit for \
+    if'[ ! -x "$NVIM_FOUND" ]' \
+    from'gh-r' \
+    sbin'**/nvim -> nvim' \
+    neovim/neovim
+
+zinit for \
+    if'[ ! -x "$RG_FOUND" ]' \
+    from'gh-r' \
+    sbin'**/rg -> rg' \
+    BurntSushi/ripgrep
+alias rg="rg --no-ignore --hidden --max-columns=150 --max-columns-preview"
+
+# https://github.com/zdharma-continuum/zinit#calling-compinit-without-turbo-mode
+autoload -Uz compinit
+compinit
+zinit cdreplay -q
+
+# https://stackoverflow.com/questions/40566430/solution-for-using-iterm2-shell-integration-and-screen-over-ssh
+ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=true
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
