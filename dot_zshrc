@@ -5,12 +5,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-EXA_FOUND="$(command -v exa)"
-FD_FOUND="$(command -v fd)"
-FZF_FOUND="$(command -v fzf)"
-NVIM_FOUND="$(command -v nvim)"
-RG_FOUND="$(command -v rg)"
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -70,7 +64,7 @@ fi
 PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 
 zinit for \
-    if'[ ! -x "$EXA_FOUND" ]' \
+    if'! which -a exa | grep --invert-match polaris > /dev/null' \
     has'unzip' \
     atclone'cp -vf completions/exa.zsh _exa' \
     from'gh-r' \
@@ -81,18 +75,13 @@ if command -v exa > /dev/null; then
 fi
 
 zinit for \
-    if' [ ! -x "$FD_FOUND" ]' \
+    if'! which -a fd | grep --invert-match polaris > /dev/null' \
     from'gh-r' \
     sbin'**/fd -> fd' \
     @sharkdp/fd
 FD="fd --hidden --no-ignore --follow --exclude .git"
 alias fd="$FD"
 
-zinit if'[ ! -x "$FZF_FOUND" ]' for \
-    from'gh-r' \
-    sbin'fzf' \
-    junegunn/fzf \
-    https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
 export FZF_DEFAULT_COMMAND="$FD --type file --color=always"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--ansi"
@@ -102,15 +91,20 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
     fd --type directory --color=always . "$1"
 }
+zinit if'! which -a fzf | grep --invert-match polaris > /dev/null' for \
+    from'gh-r' \
+    sbin'fzf' \
+    junegunn/fzf \
+    https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
 
 zinit for \
-    if'[ ! -x "$NVIM_FOUND" ]' \
+    if'! which -a nvim | grep --invert-match polaris > /dev/null' \
     from'gh-r' \
     sbin'**/nvim -> nvim' \
     neovim/neovim
 
 zinit for \
-    if'[ ! -x "$RG_FOUND" ]' \
+    if'! which -a rg | grep --invert-match polaris > /dev/null' \
     from'gh-r' \
     sbin'**/rg -> rg' \
     BurntSushi/ripgrep
