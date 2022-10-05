@@ -57,6 +57,10 @@ zinit ice atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'; zinit
 
 zinit light zdharma-continuum/zinit-annex-bin-gem-node
 
+cmd_exist() {
+    paths=$(which -a $1) && grep --invert-match polaris <<< "$paths" > /dev/null
+}
+
 if command -v assh > /dev/null; then
     alias ssh="assh wrapper ssh --"
 fi
@@ -64,7 +68,7 @@ fi
 PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 
 zinit for \
-    if'! which -a exa | grep --invert-match polaris > /dev/null' \
+    if'! cmd_exist exa' \
     has'unzip' \
     atclone'cp -vf completions/exa.zsh _exa' \
     from'gh-r' \
@@ -75,7 +79,7 @@ if command -v exa > /dev/null; then
 fi
 
 zinit for \
-    if'! which -a fd | grep --invert-match polaris > /dev/null' \
+    if'! cmd_exist fd' \
     from'gh-r' \
     sbin'**/fd -> fd' \
     @sharkdp/fd
@@ -91,20 +95,20 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
     fd --type directory --color=always . "$1"
 }
-zinit if'! which -a fzf | grep --invert-match polaris > /dev/null' for \
+zinit if'! cmd_exist fzf' for \
     from'gh-r' \
     sbin'fzf' \
     junegunn/fzf \
     https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
 
 zinit for \
-    if'! which -a nvim | grep --invert-match polaris > /dev/null' \
+    if'! cmd_exist nvim' \
     from'gh-r' \
     sbin'**/nvim -> nvim' \
     neovim/neovim
 
 zinit for \
-    if'! which -a rg | grep --invert-match polaris > /dev/null' \
+    if'! { cmd_exist rg || grep \a\n\a\c\o\n\d\a\3 "$HOME/.zshrc" > /dev/null; }' \
     from'gh-r' \
     sbin'**/rg -> rg' \
     BurntSushi/ripgrep
