@@ -1,0 +1,2 @@
+# https://github.com/zdharma-continuum/zinit#disabling-system-wide-compinit-call-ubuntu
+skip_global_compinit=1
