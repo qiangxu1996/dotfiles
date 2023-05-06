@@ -35,8 +35,6 @@ zinit snippet OMZL::key-bindings.zsh
 bindkey -v
 export KEYTIMEOUT=1
 
-zinit snippet OMZL::termsupport.zsh
-
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
