@@ -4,7 +4,7 @@
 
 ```bash
 brew install chezmoi  # macOS, or
-snap install chezmoi  # Ubuntu
+snap install --classic chezmoi  # Ubuntu
 chezmoi init --apply https://github.com/qiangxu1996/dotfiles.git
 ```
 
