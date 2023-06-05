@@ -63,7 +63,8 @@ if command -v assh > /dev/null; then
     alias ssh="assh wrapper ssh --"
 fi
 
-PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+# https://forum.snapcraft.io/t/supporting-the-zsh/2264
+PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH:/snap/bin"
 
 zinit for \
     if'! cmd_exist exa' \
@@ -78,11 +79,12 @@ if command -v exa > /dev/null; then
 fi
 
 zinit for \
-    if'! cmd_exist fd' \
+    if'! { cmd_exist fd || cmd_exist fdfind; }' \
     from'gh-r' \
     sbin'**/fd -> fd' \
     @sharkdp/fd
-FD="fd --hidden --no-ignore --follow --exclude .git"
+command -v fdfind > /dev/null && FD=fdfind || FD=fd
+FD="$FD --hidden --no-ignore --follow --exclude .git"
 alias fd="$FD"
 
 export FZF_DEFAULT_COMMAND="$FD --type file --color=always"
@@ -94,6 +96,12 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
     fd --type directory --color=always . "$1"
 }
+FZF_SHELL_PREFIX=/usr/share/doc/fzf/examples
+# Ubuntu
+if [[ -d $FZF_SHELL_PREFIX ]]; then
+    source $FZF_SHELL_PREFIX/key-bindings.zsh
+    source $FZF_SHELL_PREFIX/completion.zsh
+fi
 zinit if'! cmd_exist fzf' for \
     from'gh-r' \
     sbin'fzf' \
