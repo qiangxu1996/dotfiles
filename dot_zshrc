@@ -69,7 +69,7 @@ PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnu
 zinit for \
     if'! cmd_exist exa' \
     has'unzip' \
-    atclone'cp -vf completions/exa.zsh _exa' \
+    atclone'cp -vf completions/zsh/_exa _exa' \
     from'gh-r' \
     sbin'**/exa -> exa' \
     ogham/exa
