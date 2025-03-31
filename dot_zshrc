@@ -1,10 +1,3 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -17,119 +10,107 @@ fi
 source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
+
+# Load a few important annexes, without Turbo
+# (this is currently required for annexes)
+zinit light-mode for \
+    zdharma-continuum/zinit-annex-as-monitor \
+    zdharma-continuum/zinit-annex-bin-gem-node \
+    zdharma-continuum/zinit-annex-patch-dl \
+    zdharma-continuum/zinit-annex-rust
+
 ### End of Zinit's installer chunk
 
 HYPHEN_INSENSITIVE=true
 zinit snippet OMZL::completion.zsh
-
-zinit snippet OMZL::correction.zsh
 zinit snippet OMZL::directories.zsh
-
 zinit snippet OMZL::history.zsh
 # http://zsh.sourceforge.net/Doc/Release/Options.html#History
 unsetopt share_history
 setopt inc_append_history_time
-
 zinit snippet OMZL::key-bindings.zsh
-# https://dougblack.io/words/zsh-vi-mode.html
+# https://stackoverflow.com/questions/58187542/how-to-setup-vi-editing-mode-for-zsh
 bindkey -v
-export KEYTIMEOUT=1
+# https://www.johnhawthorn.com/2012/09/vi-escape-delays/
+KEYTIMEOUT=1
 
+# workaround default color is not distinguishable
+# https://github.com/zsh-users/zsh-autosuggestions?tab=readme-ov-file#suggestion-highlight-style
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=7"
 zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
+
 zinit light zsh-users/zsh-completions
 
-zinit ice depth=1; zinit light romkatv/powerlevel10k
-
-export _ZL_MATCH_MODE=1
-export _ZL_ADD_ONCE=1
-alias zz='z -c'
-alias zf='z -I'
-alias zb='z -b'
-alias zbf='z -b -I'
-alias zh='z -I -t .'
-zinit ice has'lua'; zinit light skywind3000/z.lua
-
+# to support colors in tab completion
 # https://zdharma-continuum.github.io/zinit/wiki/LS_COLORS-explanation/
-zinit ice atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'; zinit light trapd00r/LS_COLORS
-
-zinit light zdharma-continuum/zinit-annex-bin-gem-node
+zinit ice atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
+zinit light trapd00r/LS_COLORS
 
 cmd_exist() {
     paths=$(which -a $1) && grep --invert-match polaris <<< "$paths" > /dev/null
 }
 
-if command -v assh > /dev/null; then
-    alias ssh="assh wrapper ssh --"
+# eza does not have darwin build and zinit will download the wrong binary
+# https://github.com/zdharma-continuum/zinit/issues/575
+# https://zdharma-continuum.github.io/zinit/wiki/INTRODUCTION/#snippets-completions
+zi ice \
+    if"! cmd_exist eza && [[ $OSTYPE != darwin* ]]" \
+    atclone"curl -O https://github.com/eza-community/eza/blob/main/completions/zsh/_eza" \
+    atpull"%atclone" \
+    from"gh-r" as"program"
+zi light eza-community/eza
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/directories.zsh
+if command -v eza > /dev/null; then
+    alias ls=eza
+    alias lsa='eza -laa'
+    alias l='eza -laa'
+    alias ll='eza -l'
+    alias la='eza -la'
 fi
 
-# https://forum.snapcraft.io/t/supporting-the-zsh/2264
-PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH:/snap/bin"
-
-zinit for \
-    if'! cmd_exist exa' \
-    has'unzip' \
-    atclone'cp -vf completions/zsh/_exa _exa' \
-    from'gh-r' \
-    sbin'**/exa -> exa' \
-    ogham/exa
-if command -v exa > /dev/null; then
-    alias ls=exa
-    alias la='exa -lah'
-fi
-
-zinit for \
-    if'! { cmd_exist fd || cmd_exist fdfind; }' \
+# https://github.com/zdharma-continuum/zinit/wiki/Recipes-for-popular-programs#exa
+zi for \
+    if'! cmd_exist fd' \
+    atclone'cp -vf */autocomplete/_fd _fd' \
+    atpull'%atclone' \
     from'gh-r' \
     sbin'**/fd -> fd' \
-    @sharkdp/fd
-command -v fdfind > /dev/null && FD=fdfind || FD=fd
-FD="$FD --hidden --no-ignore --follow --exclude .git"
-alias fd="$FD"
-
-export FZF_DEFAULT_COMMAND="$FD --type file --color=always"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  @sharkdp/fd
+# https://github.com/sharkdp/fd?tab=readme-ov-file#using-fd-with-fzf
+export FZF_DEFAULT_COMMAND="fd --type file --follow --hidden --exclude .git --color=always"
 export FZF_DEFAULT_OPTS="--ansi"
-_fzf_compgen_path() {
-    fd --color=always . "$1"
-}
-_fzf_compgen_dir() {
-    fd --type directory --color=always . "$1"
-}
-FZF_SHELL_PREFIX=/usr/share/doc/fzf/examples
-# Ubuntu
-if [[ -d $FZF_SHELL_PREFIX ]]; then
-    source $FZF_SHELL_PREFIX/key-bindings.zsh
-    source $FZF_SHELL_PREFIX/completion.zsh
-fi
-zinit if'! cmd_exist fzf' for \
-    from'gh-r' \
-    sbin'fzf' \
-    junegunn/fzf \
-    https://github.com/junegunn/fzf/raw/master/shell/{'completion','key-bindings'}.zsh
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-zinit for \
-    if'! cmd_exist nvim' \
-    from'gh-r' \
-    sbin'**/nvim -> nvim' \
-    neovim/neovim
+zi ice if"! cmd_exist fzf" from"gh-r" as"program"
+zi light junegunn/fzf
+source <(fzf --zsh)
 
-zinit for \
-    if'! { cmd_exist rg || grep \a\n\a\c\o\n\d\a\3 "$HOME/.zshrc" > /dev/null; }' \
+# https://github.com/zdharma-continuum/zinit/wiki/Recipes-for-popular-programs#ripgrep
+zi for \
+    if'! cmd_exist rg' \
     from'gh-r' \
     sbin'**/rg -> rg' \
-    BurntSushi/ripgrep
-alias rg="rg --no-ignore --hidden --max-columns=150 --max-columns-preview"
+  BurntSushi/ripgrep
 
-# https://github.com/zdharma-continuum/zinit#calling-compinit-without-turbo-mode
+zi ice if"! cmd_exist starship" from"gh-r" as"program"
+zi light starship/starship
+
+# both zinit and zoxide define zi
+# https://github.com/zdharma-continuum/zinit/discussions/312
+zi ice if"! cmd_exist zoxide" from"gh-r" as"program" atload"unalias zi"
+zi light ajeetdsouza/zoxide
+
+# https://gitlab.com/gnachman/iterm2/-/wikis/tmux-Integration-Best-Practices#how-do-i-use-shell-integration
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
+unset ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX
+
+# add-to-the-end section
+zinit light zsh-users/zsh-syntax-highlighting
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+
+# plugins' completions won't load without this
+# https://github.com/zdharma-continuum/zinit?tab=readme-ov-file#calling-compinit-without-turbo-mode
 autoload -Uz compinit
 compinit
-zinit cdreplay -q
-
-# https://stackoverflow.com/questions/40566430/solution-for-using-iterm2-shell-integration-and-screen-over-ssh
-ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=true
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
