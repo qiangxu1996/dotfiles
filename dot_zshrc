@@ -96,9 +96,9 @@ zi ice if"! cmd_exist starship" from"gh-r" as"program"
 zi light starship/starship
 
 # both zinit and zoxide define zi
-# https://github.com/zdharma-continuum/zinit/discussions/312
-zi ice if"! cmd_exist zoxide" from"gh-r" as"program" atload"unalias zi"
-zi light ajeetdsouza/zoxide
+unalias zi
+zinit ice if"! cmd_exist zoxide" from"gh-r" as"program"
+zinit light ajeetdsouza/zoxide
 
 # https://gitlab.com/gnachman/iterm2/-/wikis/tmux-Integration-Best-Practices#how-do-i-use-shell-integration
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
