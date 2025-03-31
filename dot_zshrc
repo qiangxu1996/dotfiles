@@ -47,7 +47,7 @@ zinit ice atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
 zinit light trapd00r/LS_COLORS
 
 cmd_exist() {
-    paths=$(which -a $1) && grep --invert-match polaris <<< "$paths" > /dev/null
+    paths=$(which -a $1) && grep --invert-match zinit <<< "$paths" > /dev/null
 }
 
 # eza does not have darwin build and zinit will download the wrong binary

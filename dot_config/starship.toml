@@ -1,5 +1,4 @@
 # https://starship.rs/presets/plain-text
-# https://starship.rs/presets/pure-preset
 
 [git_commit]
 tag_symbol = " tag "
@@ -58,8 +57,10 @@ symbol = ".NET "
 
 [directory]
 read_only = " ro"
+# https://starship.rs/config/#directory
+truncation_length = 8
+truncation_symbol = '…/'
 truncate_to_repo = false
-style = "blue"
 
 [docker_context]
 symbol = "docker "
@@ -245,5 +246,5 @@ symbol = "terraform "
 [zig]
 symbol = "zig "
 
-[cmd_duration]
-style = "yellow"
+[hostname]
+ssh_symbol = ""
