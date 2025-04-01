@@ -29,7 +29,7 @@ symbol = "buf "
 symbol = "bun "
 
 [c]
-symbol = "C "
+disabled = true
 
 [cobol]
 symbol = "cobol "
@@ -41,7 +41,7 @@ symbol = "conda "
 symbol = "cr "
 
 [cmake]
-symbol = "cmake "
+disabled = true
 
 [daml]
 symbol = "daml "
@@ -206,6 +206,8 @@ symbol = "purs "
 
 [python]
 symbol = "py "
+detect_extensions = []
+detect_files = []
 
 [quarto]
 symbol = "quarto "
