@@ -56,9 +56,15 @@ cmd_exist() {
     paths=$(which -a $1) && grep --invert-match zinit <<< "$paths" > /dev/null
 }
 
-# eza does not have darwin build and zinit will download the wrong binary
+zi ice \
+    if"! cmd_exist dust && [[ $OSTYPE != darwin* ]]" \
+    atclone"curl -O https://github.com/bootandy/dust/blob/master/completions/_dust" \
+    atpull"%atclone" \
+    from"gh-r" sbin"**/dust -> dust"
+zi light bootandy/dust
+
+# no darwin build and zinit will download the wrong binary
 # https://github.com/zdharma-continuum/zinit/issues/575
-# https://zdharma-continuum.github.io/zinit/wiki/INTRODUCTION/#snippets-completions
 zi ice \
     if"! cmd_exist eza && [[ $OSTYPE != darwin* ]]" \
     atclone"curl -O https://github.com/eza-community/eza/blob/main/completions/zsh/_eza" \
