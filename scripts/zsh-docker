@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+script_path="${BASH_SOURCE%/*}"
+
+die() {
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+github=qiangxu1996
+root=1
+
+while :; do
+    case $1 in
+        -g|--github)
+            if [ "$2" ]; then
+                github=$2
+                shift
+            else
+                die 'ERROR: "--github" requires a non-empty option argument.'
+            fi
+            ;;
+        -u|--user)
+            root=0
+            ;;
+        -?*)
+            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            ;;
+        *)
+            break
+    esac
+
+    shift
+done
+
+base="$1"
+
+docker build \
+    --build-arg BASE="$base" \
+    --build-arg ROOT=$root \
+    --build-arg USERNAME="$(id --user --name)" \
+    --build-arg USER_UID="$(id --user)" \
+    --build-arg GROUPNAME="$(id --group --name)" \
+    --build-arg USER_GID="$(id --group)" \
+    --build-arg GITHUB_USERNAME="$github" \
+    --tag "$base-zsh" \
+    - < "$script_path/Dockerfile"

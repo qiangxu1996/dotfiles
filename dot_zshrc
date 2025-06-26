@@ -125,3 +125,5 @@ eval "$(zoxide init zsh)"
 # https://github.com/zdharma-continuum/zinit?tab=readme-ov-file#calling-compinit-without-turbo-mode
 autoload -Uz compinit
 compinit
+
+PATH="$HOME/.local/share/chezmoi/scripts:$PATH"
