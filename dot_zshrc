@@ -5,6 +5,12 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# https://github.com/zdharma-continuum/zinit#customizing-paths
+declare -A ZINIT
+ZINIT[PLUGINS_DIR]=$HOME/.local/share/zinit/plugins$zinit_suffix
+# https://github.com/zdharma-continuum/zinit#using-zpfx-variable
+ZPFX=$HOME/.local/share/zinit/polaris$zinit_suffix
+
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -96,6 +102,10 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 zi ice if"! cmd_exist fzf" from"gh-r" as"program"
 zi light junegunn/fzf
 source <(fzf --zsh)
+
+# https://github.com/zdharma-continuum/zinit#more-examples
+zi ice if"! cmd_exist micromamba" from"gh-r" as"program" mv"micromamba* -> micromamba"
+zi light mamba-org/micromamba-releases
 
 # https://github.com/zdharma-continuum/zinit/wiki/Recipes-for-popular-programs#ripgrep
 zi for \
