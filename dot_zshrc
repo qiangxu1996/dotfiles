@@ -1,3 +1,8 @@
+# https://github.com/romkatv/powerlevel10k/issues/57
+if [[ $(ulimit -u) -lt 256 ]]; then
+    GITSTATUS_NUM_THREADS=4
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
