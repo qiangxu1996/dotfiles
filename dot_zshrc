@@ -2,6 +2,13 @@
 if [[ $(ulimit -u) -lt 256 ]]; then
     GITSTATUS_NUM_THREADS=4
 fi
+# https://unix.stackexchange.com/questions/351466/set-a-default-resource-limit-for-all-users-with-systemd-cgroups
+# https://www.kernel.org/doc/Documentation/cgroup-v1/pids.txt
+cgroups_pid_file=/sys/fs/cgroup/user.slice/user-$UID.slice/pids.max
+if [[ -r $cgroups_pid_file && $(cat $cgroups_pid_file) -lt 256 ]]; then
+    GITSTATUS_NUM_THREADS=4
+fi
+unset cgroups_pid_file
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
